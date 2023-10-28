@@ -6,7 +6,6 @@ REMOTE_PATH_TO_SCRIPT = '/tmp/container_script.py'
 REMOTE_PATH_TO_LOGS = "/tmp/testfile.txt"
 LOCAL_PATH_TO_LOGS = "/home/vb/download/testfile.txt"
 
-
 class RobotData:
     """
         Klasa tworząca obiekt zawierający pożądany rodzaj loga
@@ -42,7 +41,7 @@ class RobotData:
             self.check_path(LOCAL_PATH_TO_LOGS)
         except Exception as e:
             print("An exception occurred:", str(e))
-
+            
     def invoke_ssh_connection(self):
             self.ssh = paramiko.SSHClient()
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -85,9 +84,13 @@ class RobotData:
                 # You can print the error output if needed:
                 print("Error output:")
                 print(stderr.read().decode())
+            output = stdout.read().decode()
+            print(output)
 
+        except paramiko.SSHException as ssh_error:
+            print(f"SSH error: {ssh_error}")
         except Exception as e:
-            print(f"Error executing script: {str(e)}")            
+            print(f"An unexpected error occurred: {e}")
 
     def download_log_file_from_robot(self, path_to_save):
         try:
@@ -124,4 +127,3 @@ class RobotData:
         finally:
             # Close the SSH connection
             self.ssh.close()
-            
