@@ -1,55 +1,109 @@
 import docker
+import os
+import argparse
 
-# Docker container name or ID got from API script
-def get_container_id():
-    # Initialize the Docker client
-    client = docker.from_env()
+LOG_CONTAINER_PATH = "/home/vb/log/latest/robot.log"
+LOG_CONTAINER_BUFF_PATH = "/home/vb/robotlog.txt"
 
-    try:
-        # List all containers or apply filters as needed
-        containers = client.containers.list(all=True)
 
-        # Iterate through the list of containers and print their names
-        for container in containers:
-            print(f"Container ID: {container.id}")
-            print(f"Container Name: {container.name}")
-            if "robot" in container:
-                container_id = container
-    except docker.errors.APIError as e:
-        print(f"Error while communicating with Docker API: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
-    return container_id
+class ContainerScript():
+
+    def __init__(self):
+        """
+            Definiowanie atrybutów
+        """
+        self.client = None
+        self.container_id = None
+
+    def initialize_docker_client(self):
+        try:
+            self.client = docker.from_env()
+        except docker.errors.APIError as e:
+            print(f"Error while communicating with Docker API: {e}")
+            self.client = None
+    
+    def find_Robot_container_id(self):
+        container_id = None
+
+        try:
+            containers = self.client.containers.list(all=True)
+
+            for container in containers:
+                if "robot" in container.attrs['Config']['Image']:
+                    container_id = container.id
+                    print(f"Found a robot container with ID: {container_id}")
+                    self.container_id = container_id
+
+            if container_id is None:
+                print("No robot containers found in the list of containers.")
+
+        except docker.errors.DockerException as e:
+            print(f"An error occurred while working with Docker containers: {e}")
     
 
-# List of file paths inside the container to read
-file_paths = [
-    "/path/to/file1.txt",
-    "/path/to/file2.txt",
-    # Add more file paths as needed
-]
+    def move_log_file_inside_container(self):
+        try:
+            command = f"cp {LOG_CONTAINER_PATH} {LOG_CONTAINER_BUFF_PATH}"
+            exec_instance = self.client.api.exec_create(container=self.container_id, cmd=command)
+            # The result will contain the exec instance ID
+            exec_id = exec_instance['Id']
+            # You can now start the exec instance to run the command
+            self.client.api.exec_start(exec_id)
+        except docker.errors.APIError as e:
+            # Handle Docker API-related errors
+            print(f"Docker API Error: {e}")
+        except Exception as e:
+            # Handle other exceptions
+            print(f"An error occurred: {e}")
 
-def execute_command_in_container(container, command):
-    client = docker.from_env()
-    exec_id = client.containers.get(container).exec_create(command)
-    result = client.containers.get(container).exec_start(exec_id)
-    return result.decode('utf-8')
+    def move_file_from_container(self):
 
-def main():
-    try:
-        for file_path in file_paths:
-            command = f"cat {file_path}"
-            container_name_or_id = get_container_id()
-            file_content = execute_command_in_container(container_name_or_id, command)
-            
-            print(f"Contents of {file_path}:")
-            print(file_content)
-            print("=" * 50)
-    
-    except docker.errors.NotFound:
-        print(f"Container '{container_name_or_id}' not found.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+        try:
+            # Construct the docker cp command
+            print(f'docker cp {self.container_id}:{LOG_CONTAINER_BUFF_PATH} {destination_path}')
+            docker_cp_command = f'docker cp {self.container_id}:{LOG_CONTAINER_BUFF_PATH} {destination_path}'
 
-if __name__ == "__main__":
-    main()
+            # Execute the command using os.system
+            os.system(docker_cp_command)
+
+            print(f"File from container copied to {destination_path}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+
+    def remove_file_from_container(self):
+        try:
+            # Use the `exec_run` method to execute the `rm` command inside the container
+            command = f'rm {LOG_CONTAINER_BUFF_PATH}'
+            exec_instance = self.client.api.exec_create(container=self.container_id, cmd=command)
+            # The result will contain the exec instance ID
+            exec_id = exec_instance['Id']
+            # run the command
+            self.client.api.exec_start(exec_id)
+        except docker.errors.APIError as e:
+            # Handle Docker API-related errors
+            print(f"Docker API Error: {e}")
+        except Exception as e:
+            # Handle other exceptions
+            print(f"An error occurred: {e}")
+
+    def main(self):
+        try:
+            self.initialize_docker_client()
+            self.find_Robot_container_id()
+            self.move_log_file_inside_container()
+            self.move_file_from_container()
+            self.remove_file_from_container()
+
+        except Exception as e:
+
+            print(f"An error occurred at main: {e}")
+
+
+parser = argparse.ArgumentParser(description="Copy a file from a Docker container to a local directory.")
+parser.add_argument("remote_log_path", help="remote path to copy the file to")
+args = parser.parse_args()
+
+# Assign the parsed argument to a variable named "destination_path"
+destination_path = args.remote_log_path
+obj = ContainerScript()
+obj.main()
