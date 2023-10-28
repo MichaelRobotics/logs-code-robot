@@ -4,7 +4,6 @@ import os
 LOCAL_PATH_TO_SCRIPT = '/home/vb/Bsst-logs-code/container_script.py'
 REMOTE_PATH_TO_SCRIPT = '/tmp/container_script.py'
 REMOTE_PATH_TO_LOGS = "/tmp/testfile.txt"
-LOCAL_PATH_TO_LOGS = "/home/vb/download/testfile.txt"
 
 class RobotData:
     """
@@ -26,19 +25,13 @@ class RobotData:
         if file_path == LOCAL_PATH_TO_SCRIPT:
             if not os.path.exists(file_path):
                 raise Exception(f"Script not present localy in: '{file_path}' ! ! !")
-        elif file_path == LOCAL_PATH_TO_LOGS:    
-            if os.path.exists(file_path):
-                raise Exception(f"Path '{file_path}' already taken by \
-                                 other file or dir. Remove or move old log files. \
-                                In other cases, file wil be overwritten")
-
+            
     def check_passed_local_paths(self):
         """
             Check if paths to file is already taken by other file or dir
         """
         try:
             self.check_path(LOCAL_PATH_TO_SCRIPT)
-            self.check_path(LOCAL_PATH_TO_LOGS)
         except Exception as e:
             print("An exception occurred:", str(e))
             
@@ -105,16 +98,25 @@ class RobotData:
             # Close the SFTP session and the SSH connection
             self.sftp.close()
             
-    def rm_buff_log_from_robot(self):
-        # Remove the remote file using the 'rm' command
-        command = f'rm "{REMOTE_PATH_TO_LOGS}"'
-        stdin, stdout, stderr = self.ssh.exec_command(command)
+    def rm_buff_log_and_script_from_robot(self):
+        try:
+            # Remove the remote file using the 'rm' command
+            rm_log = f'rm "{REMOTE_PATH_TO_LOGS}"'
+            rm_script = f'rm "{REMOTE_PATH_TO_SCRIPT}"'
+            stdin, stdout, stderr = self.ssh.exec_command(rm_log)
+            if stderr.read():
+                raise Exception(f"Error: {stderr.read().decode('utf-8')}")
+            else:
+                print(f"File {REMOTE_PATH_TO_LOGS} removed successfully.")
 
-        # Check for errors in the command execution
-        if stderr.read():
-            print(f"Error: {stderr.read().decode('utf-8')}")
-        else:
-            print(f"File {REMOTE_PATH_TO_LOGS} removed successfully.")
+            stdin, stdout, stderr = self.ssh.exec_command(rm_script)
+            if stderr.read():
+                raise Exception(f"Error: {stderr.read().decode('utf-8')}")
+            else:
+                print(f"File {REMOTE_PATH_TO_SCRIPT} removed successfully.")
+        
+        except Exception as e:
+            print(f"An error occurred: {str(e)}")
             
     def capture_container_log_data(self, path_to_save):
         try:
@@ -123,7 +125,7 @@ class RobotData:
             self.send_script_to_container()
             self.execute_script_inside_container()
             self.download_log_file_from_robot(path_to_save)
-#            self.rm_buff_log_from_robot()            
+            self.rm_buff_log_and_script_from_robot()            
         finally:
             # Close the SSH connection
             self.ssh.close()
