@@ -23,7 +23,7 @@ def get_ip_active_robots():
                                      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NTc2MTU1MjIsIm5iZiI6MTY1NzYxNTUyMiwianRpIjoiYmYzZDY0YmQtOGZmNC00NGZhLWJmZDItZmExZGE0MzhiMDcwIiwiZW1haWwiOiJ2YiIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyIsInJvbGVzIjpbIlNVUEVSX1VTRVIiXX0.J917aI2m8vTOFkAD8WjKs7s86fDM5x1nHH9sWwdfaVA'))
         print("log 2")
         response = requests.get(
-            f'https://{FLEET_IP}{FLEET_PORT}/api/v1/fleet/robot-specs',
+            f'https://{FLEET_IP}{FLEET_PORT}/api/v1/fleet/robot-info',
             auth=auth_bearer, verify=False, timeout=50)
         print("log 3")
         response.raise_for_status()  # Raise an exception if the HTTP response status code is not in the 200-299 range
@@ -32,10 +32,19 @@ def get_ip_active_robots():
         # Handle network-related exceptions (e.g., connection errors, timeouts)
         print(f"RequestException: {e}")
     try:
+        print("log5")
         workers = response.json()  # Parse the JSON response
-        ip_values = [item['ip'] for item in workers]
-        print(ip_values)
+        ip_values = [item['robotSpec']['ip'] for item in workers]
+        id_values = [item['robotSpec']['id'] for item in workers]
+        online_values = [item['online'] for item in workers]
+        merged_ip_online = {ip: online for ip, online in zip(ip_values, online_values)}
+        merged_id_online = {id: online for id, online in zip(id_values, online_values)}
+        active_robot_ip_list = [key for key, val in merged_ip_online.items() if val == True]
+        active_robot_id_list = [key for key, val in merged_id_online.items() if val == True]
         print("Api test succesfull!")
+        print(active_robot_ip_list)
+        print(active_robot_id_list)
+        return active_robot_ip_list, active_robot_id_list
     except json.JSONDecodeError as e:
         # Handle JSON parsing errors
         print(f"JSONDecodeError: {e}")

@@ -9,17 +9,23 @@ class RobotData:
     """
         Klasa tworząca obiekt zawierający pożądany rodzaj loga
     """
-    def __init__(self, hostname: str, port: int, username: str, password: str):
+    def __init__(self, hostname: str, id: str, port: int, username: str, password: str):
         """
-            Definiowanie danych do logowania i zmiennych komunikacyjnych
+            Definiowanie danych do logowania, id i zmiennych komunikacyjnych
         """
         self.hostname = hostname
+        self._id = id
         self.port = port
         self.username = username
         self.password = password
         self.ssh = None
         self.sftp = None
 
+    
+    @property
+    def id(self):
+        return self._id
+    
     def check_path(self, file_path):
         
         if file_path == LOCAL_PATH_TO_SCRIPT:
@@ -63,10 +69,10 @@ class RobotData:
             # Close the SFTP connection
             self.sftp.close()
 
-    def execute_script_inside_container(self):
+    def execute_script_inside_container(self, log_path):
         try:
         # Execute the script remotely
-            stdin, stdout, stderr = self.ssh.exec_command(f'python3 {REMOTE_PATH_TO_SCRIPT} {REMOTE_PATH_TO_LOGS}')
+            stdin, stdout, stderr = self.ssh.exec_command(f'python3 {REMOTE_PATH_TO_SCRIPT} {REMOTE_PATH_TO_LOGS} {log_path}')
 
             # Wait for the command to complete
             exit_status = stdout.channel.recv_exit_status()
@@ -114,12 +120,12 @@ class RobotData:
         except Exception as e:
             print(f"An error occurred: {str(e)}")
             
-    def capture_container_log_data(self, path_to_save):
+    def capture_container_log_data(self, path_to_save, log_path):
         try:
             self.check_passed_local_paths()
             self.invoke_ssh_connection()
             self.send_script_to_container()
-            self.execute_script_inside_container()
+            self.execute_script_inside_container(log_path)
             self.download_log_file_from_robot(path_to_save)
             self.rm_buff_log_and_script_from_robot()            
         finally:
