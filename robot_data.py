@@ -19,7 +19,6 @@ class RobotData:
         self.password = password
         self.ssh = None
         self.sftp = None
-
     
     @property
     def id(self):
@@ -38,10 +37,6 @@ class RobotData:
                 print(f"log copy action failed with exit status {exit_status}")
                 # You can print the error output if needed:
                 print("Error output:")
-                print(stderr)
-
-        except Exception as e:
-            print(f"Error executing script: {str(e)}")            
 
     def download_log_file_from_robot(self, path_to_save):
         try:
@@ -78,4 +73,3 @@ class RobotData:
         finally:
             # Close the SSH connection
             self.ssh.close()
-            
