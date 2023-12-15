@@ -1,17 +1,36 @@
 #!/usr/bin/env python3
 
+from log_generator import LogGenerator
 from robot_data import RobotData
+from log_data_interpretation import DataInterpreter
 import requests
 import json
 from utils import BearerAuth
 from os import getenv
 from urllib3.exceptions import InsecureRequestWarning
+from pathlib import Path
+
+home_directory = Path.home()
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
+# Fleet Address
 FLEET_PORT = ":443"
-FLEET_IP = "192.168.1.78"
-PATH_TO_LOGS = "/home/vb/log/latest/robot.log"
+FLEET_IP = "192.168.1.31"
+
+# Log paths on robots
+PATH_TO_LOGS_ROBOT = "/home/vb/log/latest/robot.log"
+
+# Log paths on fleet
+PATH_TO_LOGS_FLEET = "/home/vb/log/latest/robot.log"
+
+# Paths for final output
+# ADD FINAL PATHS
+PATH_TO_VALID_AP = f"{home_directory}/"
+PATH_TO_INVALID_AP = f"{home_directory}/"
+PATH_TO_AP_SUMMARY = f"{home_directory}/"
+PATH_TO_ROBOT_SUMMARY = f"{home_directory}/"
+
 
 def connect_to_all_active_robots(ip_values, id_values, username_values, password_values):
 
@@ -27,20 +46,21 @@ def connect_to_all_active_robots(ip_values, id_values, username_values, password
             robot_data_obj = RobotData(ip_val, id_val, 22, username, password)
             objects_list.append(robot_data_obj)
         except Exception as e:
-            print(f"An error occurred when creating RobotData object for ip_val '{ip_val}': {e}")
+            print(f"An error occurred when creating RobotData object for robot '{ip_val}': {e}")
 
     # Printing PC's identification
     for obj in objects_list:
         print(f"ip_val: {obj.hostname}, user: {obj.username}")
     return objects_list
 
-def get_data_from_all_active_robots(objects_list, log_path):
-    """
-        Create log files 
-    """
-    for obj in objects_list:
-        path_to_save = f"/home/vb/log_{obj.id}.txt"
-        obj.capture_container_log_data(path_to_save, log_path)
+#  MUST MODIFY IN PRODUCTION!!!
+def connect_to_fleet(ip_value):
+    try:
+        fleet_data_obj = RobotData(ip_value, None, 22, "vb", "Versabot2001")
+        return fleet_data_obj
+    except Exception as e:
+        print(f"An error occurred when creating RobotData object for fleet '{ip_value}': {e}")
+        return None
 
 def transform_ip_pas_usr(ip_values):
     """
@@ -102,11 +122,35 @@ def main():
         actual_ip_val, actual_username_val, actual_password_val = transform_ip_pas_usr(ip_values)
         if ip_values is None:
             raise ValueError("The 'ip_values' variable is None.")
-        objects_list = connect_to_all_active_robots(actual_ip_val, id_values, actual_username_val, actual_password_val)
-        get_data_from_all_active_robots(objects_list, PATH_TO_LOGS)
+        robot_list = connect_to_all_active_robots(actual_ip_val, id_values, actual_username_val, actual_password_val)
+#        fleet = connect_to_fleet(FLEET_IP)
+        All_AP_dataframe = LogGenerator(robot_list, PATH_TO_LOGS_FLEET, PATH_TO_LOGS_ROBOT)
+        Data_interpreter_instance = DataInterpreter(All_AP_dataframe.generate_log_output())
+
+        ###### From this moment, list of AP is created #####
+
+        print(Data_interpreter_instance.filter_for_correct_ap_actions())
+        ###### From this moment, Output files are created, everything is done! #####
+
     except Exception as e:
         print(f"An error occurred when executing main script: {e}")
         # You can also log the exception or take other actions as needed
 
 if __name__ == "__main__":
     main()
+
+
+    ############## WARNING! ###############
+    #
+    # Not every user of this script have an PC named VB!! change this in code.
+    #
+    # TO DO:
+    # 0. Check script for bigger files
+    # 1. Check if main utils and robot data properly gets robot list and files.
+    # 2. Connect (main utils and robot data) with generator and comparer
+    # 3. How to pull it on real robots? Create two versions.
+    # 4. Create Idea for an log_data_interpretation
+    # 5. Idea...
+    #
+    ########################################
+
