@@ -1,0 +1,2 @@
+Robot	TIME_START	TIME_END	AP_NAME	ACTION_ERROR(waiting, aborted)	DOCK_TRY(Position incorrect)	DOCK_CORRECT(Position correct)	UNDOCK_INCORRECT(Departing failed)
+robotwo	2023-10-03 12:00:04	2023-10-03 12:04:44	C0102	0	0	1	0

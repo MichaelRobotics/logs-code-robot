@@ -1,0 +1,30 @@
+Time	rest
+2023-10-03 10:50:03	vb_manager.mm - info - PFT.9f779.1 - ActionPoint(id: 'GTW01') started.
+2023-10-03 10:54:10	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 11:00:17	vb_manager.am - info - PFT.9f779.1 - Action completed.
+2023-10-03 11:00:17	vb_manager.mm - info - PFT.9f779.2 - ActionPoint(id: 'C0309') started.
+2023-10-03 11:19:30	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 11:20:52	vb_manager.am - info - PFT.9f779.2 - Action completed.
+2023-10-03 11:20:52	vb_manager.mm - info - PFT.4dcef.I - ActionPoint(id: 'IPS06') started.
+2023-10-03 11:26:04	vb_manager.am - info - PFT.4dcef.I - Action completed.
+2023-10-03 11:26:04	vb_manager.mm - info - PFT.a639f.1 - ActionPoint(id: 'GTW01') started.
+2023-10-03 11:30:32	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 11:37:37	vb_manager.am - info - PFT.a639f.1 - Action completed.
+2023-10-03 11:37:37	vb_manager.mm - info - PFT.a639f.2 - ActionPoint(id: 'C0209') started.
+2023-10-03 11:41:20	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 11:43:02	vb_manager.am - info - PFT.a639f.2 - Action completed.
+2023-10-03 11:43:02	vb_manager.mm - info - PFT.9c0f4.1 - ActionPoint(id: 'GTW01') started.
+2023-10-03 11:58:32	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 12:00:04	vb_manager.am - info - PFT.9c0f4.1 - Action completed.
+2023-10-03 12:00:04	vb_manager.mm - info - PFT.9c0f4.2 - ActionPoint(id: 'C0102') started.
+2023-10-03 12:02:00	vb_manager.action - info - 5 CorrectModule - Position correct.
+2023-10-03 12:04:44	vb_manager.am - info - PFT.9c0f4.2 - Action completed.
+2023-10-03 12:04:44	vb_manager.mm - info - PFT.336b7.I - ActionPoint(id: 'IPS02') started.
+2023-10-03 14:43:32	vb_manager.mm - info - PFT.eb149.I - ActionPoint(id: 'IPS02') started.
+2023-10-03 14:44:48	vb_manager.am - info - Action aborted.
+2023-10-03 14:45:01	vb_manager.am - info - PFT.eb149.I - Action aborted.
+2023-10-03 14:45:02	vb_manager.mm - info - PFT.13d88.I - ActionPoint(id: 'IPS02') started.
+2023-10-03 14:45:19	vb_manager.am - info - Action aborted.
+2023-10-03 14:45:33	vb_manager.am - info - PFT.13d88.I - Action aborted.
+2023-10-03 14:53:12	vb_manager.mm - info - PFT.1eada.I - ActionPoint(id: 'IPS08') started.
+2023-10-03 15:13:24	vb_manager.mm - info - PFT.f2c58.I - ActionPoint(id: 'IDLE04') started.
