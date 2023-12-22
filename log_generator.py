@@ -61,37 +61,38 @@ class LogGenerator:
         return output_file_path
 
     def generate_log_output(self):
+        print(self.robotlist)
+        for robot in self.robotlist:
+            path_to_save_tool = f"/home/vb/logo_{robot.id}.txt"
+            path_to_save_vbmanager = f"/home/vb/logo_{robot.id}.txt"
 
-#        for robot in self.robotlist:
-#            path_to_save_tool = f"/home/vb/log_{robot.id}.txt"
-#            path_to_save_vbmanager = f"/home/vb/log_{robot.id}.txt"
-#
-#            #  ADDED IN TESTING, REMOVE IN PRODUCTION!!!
-#            if robot.id == "robotone":
-#                log_path_tool = f"/home/vbmichal2/log/latest/robot.log"
-#                log_path_vbmanager = f"/home/vbmichal2/log/latest/robot.log"
-#            elif robot.id == "robottwo":
-#                log_path_tool = f"/home/dev/log/latest/robot.log"
-#                log_path_vbmanager = f"/home/dev/log/latest/robot.log"
-#            elif robot.id == "robotthree":
-#                log_path_tool = f"/home/vb/log/latest/robot.log"
-#                log_path_vbmanager = f"/home/vb/log/latest/robot.log"
-#            else:
-#                pass
-#            robot.capture_container_log_data(path_to_save_tool, log_path_tool)
-#            robot.capture_container_log_data(path_to_save_vbmanager, log_path_vbmanager)
-        robot_id = "robotwo"
-        path_to_save_vbmanager = f"/home/vb/log_{robot_id}.txt"
-        vb_manager_filtered_log_path = self.filter_vbmanagerlog(path_to_save_vbmanager, VB_MANAGER_TEXT_TO_FIND)
-#        safety_bridge_filtered_log_path = self.filter_safetybridge(path_to_save_tool)
-        print(vb_manager_filtered_log_path)
-        single_robot_AP_data = Comparer(vb_manager_filtered_log_path, robot_id)
+            #  ADDED IN TESTING, REMOVE IN PRODUCTION!!!
+            if robot.id == "robotone":
+                log_path_vbmanager = f"/home/vbmichal2/log/latest/robot.log"
+            elif robot.id == "robottwo":
+                log_path_vbmanager = f"/home/dev/log/latest/robot.log"
+            elif robot.id == "robotthree":
+                log_path_vbmanager = f"/home/vb/log/latest/robot.log"
+            else:
+                pass
+            robot.capture_container_log_data(path_to_save_vbmanager, log_path_vbmanager)
+
+#        robot_id = "robotwo"
+#        path_to_save_vbmanager = f"/home/vb/log_{robot_id}.txt"
+            vb_manager_filtered_log_path = self.filter_vbmanagerlog(path_to_save_vbmanager, VB_MANAGER_TEXT_TO_FIND)
+#            safety_bridge_filtered_log_path = self.filter_safetybridge(path_to_save_tool)
+            print(vb_manager_filtered_log_path)
+            print("DF")
+            single_robot_AP_data = Comparer(vb_manager_filtered_log_path, robot.id)
+            print("CF")
         
-        if self.All_AP_data is None:
-            self.All_AP_data = single_robot_AP_data.create_final_robot_ap_dataframe()
-#            print(self.All_AP_data)
-        else:
-            self.All_AP_data = pd.concat([self.All_AP_data, single_robot_AP_data.create_final_robot_ap_dataframe()], axis=0)
+            if self.All_AP_data is None:
+                self.All_AP_data = single_robot_AP_data.create_final_robot_ap_dataframe()
+                print(type(self.All_AP_data))
+#                print(self.All_AP_data)
+            else:
+                self.All_AP_data = pd.concat([self.All_AP_data, single_robot_AP_data.create_final_robot_ap_dataframe()], axis=0)
+                print(type(self.All_AP_data))
         return self.All_AP_data
             
 if __name__ == "__main__":

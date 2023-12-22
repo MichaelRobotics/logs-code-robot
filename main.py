@@ -2,7 +2,7 @@
 
 from log_generator import LogGenerator
 from robot_data import RobotData
-from log_data_interpretation import DataInterpreter
+from log_data_interpretation import AllApDataInterpreter
 import requests
 import json
 from utils import BearerAuth
@@ -21,23 +21,18 @@ FLEET_IP = "192.168.1.31"
 # Log paths on robots
 PATH_TO_LOGS_ROBOT = "/home/vb/log/latest/robot.log"
 
-# Log paths on fleet
-PATH_TO_LOGS_FLEET = "/home/vb/log/latest/robot.log"
-
 # Paths for final output
 # ADD FINAL PATHS
-PATH_TO_VALID_AP = f"{home_directory}/"
-PATH_TO_INVALID_AP = f"{home_directory}/"
-PATH_TO_AP_SUMMARY = f"{home_directory}/"
-PATH_TO_ROBOT_SUMMARY = f"{home_directory}/"
-
 
 def connect_to_all_active_robots(ip_values, id_values, username_values, password_values):
 
     objects_list = []
     username_iterator = iter(username_values)
     password_iterator = iter(password_values)
-
+    print(ip_values)
+    print(id_values)
+    print(username_values)
+    print(password_values)
     # Create objects that communicate to PC's with robots onboard
     for ip_val, id_val in zip(ip_values, id_values):
         try:
@@ -45,11 +40,13 @@ def connect_to_all_active_robots(ip_values, id_values, username_values, password
             password = next(password_iterator)
             robot_data_obj = RobotData(ip_val, id_val, 22, username, password)
             objects_list.append(robot_data_obj)
+            print(objects_list)
         except Exception as e:
             print(f"An error occurred when creating RobotData object for robot '{ip_val}': {e}")
 
     # Printing PC's identification
     for obj in objects_list:
+        print("XF")
         print(f"ip_val: {obj.hostname}, user: {obj.username}")
     return objects_list
 
@@ -99,16 +96,20 @@ def get_data_active_robots():
         print(f"RequestException: {e}")
         return  None
     try:
-        workers = response.json()  # Parse the JSON response
-        ip_values = [item['robotSpec']['ip'] for item in workers]
-        id_values = [item['robotSpec']['id'] for item in workers]
-        online_values = [item['online'] for item in workers]
-        merged_ip_online = {ip: online for ip, online in zip(ip_values, online_values)}
-        merged_id_online = {id: online for id, online in zip(id_values, online_values)}
-        active_robot_ip_list = [key for key, val in merged_ip_online.items() if val == True]
-        active_robot_id_list = [key for key, val in merged_id_online.items() if val == True]
-        print(active_robot_ip_list)
-        print(active_robot_id_list)
+    ##############COMMENTED FOR NOT WORKING FLEET API###############
+    #    workers = response.json()  # Parse the JSON response
+    #    ip_values = [item['robotSpec']['ip'] for item in workers]
+    #    id_values = [item['robotSpec']['id'] for item in workers]
+    #    online_values = [item['online'] for item in workers]
+    #    merged_ip_online = {ip: online for ip, online in zip(ip_values, online_values)}
+    #    merged_id_online = {id: online for id, online in zip(id_values, online_values)}
+    #    active_robot_ip_list = [key for key, val in merged_ip_online.items() if val == True]
+    #    active_robot_id_list = [key for key, val in merged_id_online.items() if val == True]
+    #    print(active_robot_ip_list)
+    #    print(active_robot_id_list)
+    ########################################################
+        active_robot_ip_list = ["robotone", "robottwo", "robotthree"]
+        active_robot_id_list = ["robotone", "robottwo", "robotthree"]
         return active_robot_ip_list, active_robot_id_list
     except json.JSONDecodeError as e:
         # Handle JSON parsing errors
@@ -119,18 +120,22 @@ def main():
     try:
         # Get Ip from active robots on fleet
         ip_values, id_values = get_data_active_robots()
+
         actual_ip_val, actual_username_val, actual_password_val = transform_ip_pas_usr(ip_values)
         if ip_values is None:
             raise ValueError("The 'ip_values' variable is None.")
         robot_list = connect_to_all_active_robots(actual_ip_val, id_values, actual_username_val, actual_password_val)
-#        fleet = connect_to_fleet(FLEET_IP)
-        All_AP_dataframe = LogGenerator(robot_list, PATH_TO_LOGS_FLEET, PATH_TO_LOGS_ROBOT)
-        Data_interpreter_instance = DataInterpreter(All_AP_dataframe.generate_log_output())
+        print("xfxfsdf")
+        print(robot_list)
+        All_AP_dataframe = LogGenerator(robot_list) #PATH_TO_LOGS_ROBOT
+        All_AP_dataframe_file = All_AP_dataframe.generate_log_output()
+        All_AP_dataframe_file.to_csv('All_AP_dataframe_file.txt', sep='\t', index=False)
+        print(All_AP_dataframe_file)
+        Data_interpreter_instance = AllApDataInterpreter(All_AP_dataframe_file)
+        print("whatsup")
+        Data_interpreter_instance.generate_all_robot_dataframe()
 
-        ###### From this moment, list of AP is created #####
-
-        print(Data_interpreter_instance.filter_for_correct_ap_actions())
-        ###### From this moment, Output files are created, everything is done! #####
+#        print(Data_interpreter_instance.filter_for_correct_ap_actions())
 
     except Exception as e:
         print(f"An error occurred when executing main script: {e}")
@@ -140,17 +145,16 @@ if __name__ == "__main__":
     main()
 
 
-    ############## WARNING! ###############
+    ############## FOR TESTING! ###############
     #
     # Not every user of this script have an PC named VB!! change this in code.
-    #
+    # 
     # TO DO:
-    # 0. Check script for bigger files
-    # 1. Check if main utils and robot data properly gets robot list and files.
-    # 2. Connect (main utils and robot data) with generator and comparer
-    # 3. How to pull it on real robots? Create two versions.
-    # 4. Create Idea for an log_data_interpretation
-    # 5. Idea...
+    # 1. Put Logs and manage excpectations of log_data_interpretation
+    # 2. Try to make it more readable and ready to customize and reprezentation
+    # 3. Make version for sim and Robots
+    # 4. Discuss for proper logs interpretation
+    #
     #
     ########################################
 

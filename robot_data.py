@@ -1,6 +1,5 @@
 import utils
 
-#LOCAL_PATH_TO_SCRIPT = '/home/vb/Bsst-logs-code/container_script.py'
 REMOTE_PATH_TO_SCRIPT = '/tmp/container_script.py'
 REMOTE_PATH_TO_LOGS = "/tmp/testfile.txt"
 
@@ -45,7 +44,7 @@ class RobotData:
 
     def download_log_file_from_robot(self, path_to_save):
         try:
-            self.sftp = utils.SFTPclient(self.ssh)
+            self.sftp = utils.SFTPclient(self.ssh).sftp
             self.sftp.get(REMOTE_PATH_TO_LOGS, path_to_save)
             print(f"File '{path_to_save}' downloaded from '{REMOTE_PATH_TO_LOGS}'")
         except FileNotFoundError:
@@ -71,7 +70,7 @@ class RobotData:
             
     def capture_container_log_data(self, path_to_save, log_path):
         try:
-            self.ssh = utils.SSHinvoker()
+            self.ssh = utils.SSHinvoker(self.hostname, self.port, self.username, self.password).ssh
             self.copy_log(log_path)
             self.download_log_file_from_robot(path_to_save)
             self.rm_buff_log_and_script_from_robot()            
