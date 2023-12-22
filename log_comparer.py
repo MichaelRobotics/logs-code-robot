@@ -1,5 +1,42 @@
+# Comparer class is used to create an object, which process filetered_log_dataframe got from interaction with 
+# object of type LogGenerator. Goal of Comparer class is to create AP_dataframe, which contains information
+# about all actions related with docking&undocking related to AP found in filetered_log_dataframe. Each row of an dataframe has 1 row and 8 columns.
+# AP_dataframe is created from ACTION_PONT_DATAFRAME dictionary. Words contained betwen brackets (), are search for, in each line of filtered_log_dataframe created by LogGenerator object. If found, 
+# value for specific row and column, is incremented by 1.
+
+
+###### CHANGE IF ######:
+# - words between brackets which define lines of dataframe related with docking&undocking action change for
+# ACTION_ERROR or DOCK_TRY or DOCK_CORRECT or UNDOCK_INCORRECT
+# for instance, change from: ACTION_ERROR(waiting, aborted)  ---->  ACTION_ERROR(waiting, aborted)
+ACTION_PONT_DATAFRAME = {
+    'Robot': ["LOCKED"],
+    'TIME_START': ["Initial"],
+    'TIME_END': ["Initial"],
+    'AP_NAME': ["None"],
+    'ACTION_ERROR(waiting, aborted)': [0],
+    'DOCK_TRY(Position incorrect)': [0],
+    'DOCK_CORRECT(Position correct)': [0],
+    'UNDOCK_INCORRECT(Departing failed)': [0]
+}
+###### FORIBIDDEN ######
+# Changing any other parameter in ACTION_PONT_DATAFRAME
+
+
+# In order to acces class funcionality, call create_final_robot_ap_dataframe function on its object.
+
+# Order of tasks done by function:
+# 1. Create initial ACTION_POINT_DATAFRAME
+# 2. Then in loop, search for data defining Action point actions in each filtered log file. 
+# if found, create action_point_dataframe and complete it by looking for words contained betwen brackets ()
+# After creating single ap_dataframe, serach for another action point untill data for ALL ap will be extraced
+# from filtered log.
+
+
+
 import pandas as pd
 import re
+
 
 TESTING_PATH_VBMANAGERLOGS = "/home/vb/Downloads/AP_CREATION_TEST.txt"
 class Comparer:
@@ -186,16 +223,8 @@ class Comparer:
 
     def create_single_ap_dataframe_template(self): 
         try:
-            self.action_point_dataframe = pd.DataFrame({
-                'Robot': [self.robot_id],
-                'TIME_START': ["Initial"],
-                'TIME_END': ["Initial"],
-                'AP_NAME': ["None"],
-                'ACTION_ERROR(waiting, aborted)': [0],
-                'DOCK_TRY(Position incorrect)': [0],
-                'DOCK_CORRECT(Position correct)': [0],
-                'UNDOCK_INCORRECT(Departing failed)': [0]
-            })
+            self.action_point_dataframe = pd.DataFrame(ACTION_PONT_DATAFRAME)
+            self.action_point_dataframe['Robot'] = self.robot_id
         except Exception as e:
             print(f"Error creating single AP dataframe template: {e}")
 

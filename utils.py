@@ -1,3 +1,7 @@
+# class BearerAuth is used to store API token
+# class SSHinvoker is used to create ssh connection with robot
+# class SFTPclient is used to create medium, through which files can be transported from robot to host
+
 import requests
 import paramiko
 
@@ -10,7 +14,11 @@ class BearerAuth(requests.auth.AuthBase):
         return r
     
 class SSHinvoker():
-    def __init__(self):
+    def __init__(self, hostname, port, username, password):
+        self.hostname = hostname
+        self.port = port
+        self.username = username
+        self.password = password
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:

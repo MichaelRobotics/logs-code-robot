@@ -1,8 +1,20 @@
-import utils
-
-#LOCAL_PATH_TO_SCRIPT = '/home/vb/Bsst-logs-code/container_script.py'
-REMOTE_PATH_TO_SCRIPT = '/tmp/container_script.py'
+# class RobotData is used to manage downloading/manipulating logs from instance of object
+# which is connected to robot itself. Logs ready to download are stored on robot at location:
 REMOTE_PATH_TO_LOGS = "/tmp/testfile.txt"
+
+
+# In order to acces class funcionality, call capture_container_log_data function on its object.
+
+# Order of tasks done by function:
+# 1. Connect to robot using utils.SSHinvoker class
+# 2. cp log from robot(robot log path is defined in main.py)
+# into file: REMOTE_PATH_TO_LOGS, from which it will be downloaded to host
+# 3. Send log from REMOTE_PATH_TO_LOGS to host using SFTPclient class
+# 4. rm copied logs from REMOTE_PATH_TO_LOG 
+
+
+
+import utils
 
 class RobotData:
     """
@@ -40,7 +52,7 @@ class RobotData:
 
     def download_log_file_from_robot(self, path_to_save):
         try:
-            self.sftp = utils.SFTPclient(self.ssh)
+            self.sftp = utils.SFTPclient(self.ssh).sftp
             self.sftp.get(REMOTE_PATH_TO_LOGS, path_to_save)
             print(f"File '{path_to_save}' downloaded from '{REMOTE_PATH_TO_LOGS}'")
         except FileNotFoundError:
@@ -66,7 +78,7 @@ class RobotData:
             
     def capture_container_log_data(self, path_to_save, log_path):
         try:
-            self.ssh = utils.SSHinvoker()
+            self.ssh = utils.SSHinvoker(self.hostname, self.port, self.username, self.password).ssh
             self.copy_log(log_path)
             self.download_log_file_from_robot(path_to_save)
             self.rm_buff_log_and_script_from_robot()            
