@@ -3,10 +3,12 @@
 ###### CHANGE IF ######:
 # - Robot logging credentials are changed(UERNAME, PASSWORD)
 # - Fleet IP is changed(FLEET_IP, FLEET_PORT)
-PASSWORD = "vbrobot123"
-USERNAME = "vb"
-FLEET_PORT = ":443"
-FLEET_IP = "192.168.1.31"
+PASSWORD = "NULL"
+USERNAME = "NULL"
+FLEET_PORT = "NULL"
+FLEET_IP = "NULL"
+FLEET_PASWWORD = "NULL"
+JWT_API_KEY = "KEY"
 
 # and downloads log file from path: 
 
@@ -70,7 +72,7 @@ def connect_to_all_active_robots(ip_values, id_values):
 #  MUST MODIFY IN PRODUCTION!!!
 def connect_to_fleet(ip_value):
     try:
-        fleet_data_obj = RobotData(ip_value, None, 22, "vb", "Versabot2001")
+        fleet_data_obj = RobotData(ip_value, None, 22, "vb", FLEET_PASWWORD)
         return fleet_data_obj
     except Exception as e:
         print(f"An error occurred when creating RobotData object for fleet '{ip_value}': {e}")
@@ -105,7 +107,7 @@ def connect_to_fleet(ip_value):
 def get_data_active_robots():
     try:
         auth_bearer = BearerAuth(getenv('JWT_API_KEY',
-                                     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NTc2MTU1MjIsIm5iZiI6MTY1NzYxNTUyMiwianRpIjoiYmYzZDY0YmQtOGZmNC00NGZhLWJmZDItZmExZGE0MzhiMDcwIiwiZW1haWwiOiJ2YiIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyIsInJvbGVzIjpbIlNVUEVSX1VTRVIiXX0.J917aI2m8vTOFkAD8WjKs7s86fDM5x1nHH9sWwdfaVA'))
+                                        JWT_API_KEY))
         response = requests.get(
             f'https://{FLEET_IP}{FLEET_PORT}/api/v1/fleet/robot-info',
             auth=auth_bearer, verify=False, timeout=50)
