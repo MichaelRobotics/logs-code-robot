@@ -33,6 +33,9 @@ PATH_TO_LOGS_ROBOT = "/home/vb/log/latest/vb_robot.log"
 # Algorithm of created statistics is described in AllApDataInterpreter class.  
  
 
+ACTUAL_PASSWOR_ROBOTONE = ""
+ACTUAL_PASSWOR_ROBOTTWO = ""
+ACTUAL_PASSWOR_ROBOTTHREE = ""
 
 from log_generator import LogGenerator
 from robot_data import RobotData
@@ -91,15 +94,15 @@ def connect_to_fleet(ip_value):
 #        if ip_val == "robotone":
 #            actual_ip_val.append("192.168.1.78")
 #            actual_username_val.append("vbmichal2")
-#            actual_password_val.append("vbrobot123")
+#            actual_password_val.append("ACTUAL_PASSWOR_ROBOTONE")
 #        elif ip_val == "robottwo":
 #            actual_ip_val.append("192.168.1.73")
 #            actual_username_val.append("dev")
-#            actual_password_val.append("vbrobot123")
+#            actual_password_val.append("ACTUAL_PASSWOR_ROBOTTWO")
 #        elif ip_val == "robotthree":
 #            actual_ip_val.append("192.168.1.31")
 #            actual_username_val.append("vb")
-#            actual_password_val.append("Versabot2001")
+#            actual_password_val.append("ACTUAL_PASSWOR_ROBOTTHREE")
 #        else:
 #            print(f"Invalid IP value: {ip_val}")
 #    return actual_ip_val, actual_username_val, actual_password_val
