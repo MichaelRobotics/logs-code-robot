@@ -15,8 +15,26 @@ home_directory = Path.home()
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 # Fleet Address
-FLEET_PORT = ":443"
-FLEET_IP = "192.168.1.31"
+FLEET_PORT = ""
+FLEET_IP = ""
+# Robot ID's
+ROBOT_ONE_ID = ""
+ROBOT_TWO_ID = ""
+ROBOT_THREE_ID = ""
+# Robot IP's
+ROBOT_ONE_IP = "
+ROBOT_TWO_IP = "
+ROBOT_THREE_IP = "
+# Robot Usernames
+ROBOT_ONE_USERNAME = ""
+ROBOT_TWO_USERNAME = ""
+ROBOT_THREE_USERNAME = ""
+# Robot Passwords
+ROBOT_ONE_PASSWORD = ""
+ROBOT_TWO_PASSWORD = ""
+ROBOT_THREE_PASSWORD = ""
+# JWT API Key
+JWT_API_KEY = ""
 
 # Log paths on robots
 PATH_TO_LOGS_ROBOT = "/home/vb/log/latest/robot.log"
@@ -53,7 +71,7 @@ def connect_to_all_active_robots(ip_values, id_values, username_values, password
 #  MUST MODIFY IN PRODUCTION!!!
 def connect_to_fleet(ip_value):
     try:
-        fleet_data_obj = RobotData(ip_value, None, 22, "vb", "Versabot2001")
+        fleet_data_obj = RobotData(ip_value, None, 22, "vb", ROBOT_ONE_PASSWORD)
         return fleet_data_obj
     except Exception as e:
         print(f"An error occurred when creating RobotData object for fleet '{ip_value}': {e}")
@@ -67,18 +85,18 @@ def transform_ip_pas_usr(ip_values):
     actual_username_val = []
     actual_password_val = []
     for ip_val in ip_values:
-        if ip_val == "robotone":
-            actual_ip_val.append("192.168.1.78")
-            actual_username_val.append("vbmichal2")
-            actual_password_val.append("vbrobot123")
-        elif ip_val == "robottwo":
-            actual_ip_val.append("192.168.1.73")
-            actual_username_val.append("dev")
-            actual_password_val.append("vbrobot123")
-        elif ip_val == "robotthree":
-            actual_ip_val.append("192.168.1.31")
-            actual_username_val.append("vb")
-            actual_password_val.append("Versabot2001")
+        if ip_val == ROBOT_ONE_ID:
+            actual_ip_val.append(ROBOT_ONE_IP)
+            actual_username_val.append(ROBOT_ONE_USERNAME)
+            actual_password_val.append(ROBOT_ONE_PASSWORD)
+        elif ip_val == ROBOT_TWO_ID:
+            actual_ip_val.append(ROBOT_TWO_IP)
+            actual_username_val.append(ROBOT_TWO_USERNAME)
+            actual_password_val.append(ROBOT_TWO_PASSWORD)
+        elif ip_val == ROBOT_THREE_ID:
+            actual_ip_val.append(ROBOT_THREE_IP)
+            actual_username_val.append(ROBOT_THREE_USERNAME)
+            actual_password_val.append(ROBOT_THREE_PASSWORD)
         else:
             print(f"Invalid IP value: {ip_val}")
     return actual_ip_val, actual_username_val, actual_password_val
@@ -86,7 +104,7 @@ def transform_ip_pas_usr(ip_values):
 def get_data_active_robots():
     try:
         auth_bearer = BearerAuth(getenv('JWT_API_KEY',
-                                     'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NTc2MTU1MjIsIm5iZiI6MTY1NzYxNTUyMiwianRpIjoiYmYzZDY0YmQtOGZmNC00NGZhLWJmZDItZmExZGE0MzhiMDcwIiwiZW1haWwiOiJ2YiIsImZyZXNoIjpmYWxzZSwidHlwZSI6ImFjY2VzcyIsInJvbGVzIjpbIlNVUEVSX1VTRVIiXX0.J917aI2m8vTOFkAD8WjKs7s86fDM5x1nHH9sWwdfaVA'))
+                                        JWT_API_KEY))
         response = requests.get(
             f'https://{FLEET_IP}{FLEET_PORT}/api/v1/fleet/robot-info',
             auth=auth_bearer, verify=False, timeout=50)
@@ -108,8 +126,8 @@ def get_data_active_robots():
     #    print(active_robot_ip_list)
     #    print(active_robot_id_list)
     ########################################################
-        active_robot_ip_list = ["robotone", "robottwo", "robotthree"]
-        active_robot_id_list = ["robotone", "robottwo", "robotthree"]
+        active_robot_ip_list = [ROBOT_ONE_IP, ROBOT_TWO_IP, ROBOT_THREE_IP]
+        active_robot_id_list = [ROBOT_ONE_ID, ROBOT_TWO_ID, ROBOT_THREE_ID]
         return active_robot_ip_list, active_robot_id_list
     except json.JSONDecodeError as e:
         # Handle JSON parsing errors
